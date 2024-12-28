@@ -1,4 +1,4 @@
-package com.example.tictactoe2
+package com.example.tictactoe
 
 import android.os.Bundle
 import android.view.View
