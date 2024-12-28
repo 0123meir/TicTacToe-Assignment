@@ -1,4 +1,4 @@
-package com.example.tictactoe
+package com.example.tictactoe2
 
 import android.os.Bundle
 import android.view.View
@@ -35,9 +35,10 @@ class MainActivity : AppCompatActivity() {
     private fun initializeGame() {
         gameState = GameState()
         turnIndicatorTextView.visibility = View.VISIBLE
-        turnIndicatorTextView.text = getString(R.string.play_prompt,gameState.turn)
+        turnIndicatorTextView.text = getString(R.string.play_prompt, gameState.turn)
         playAgainButton.visibility = View.GONE
         resetGrid()
+        setButtonClickListeners()
     }
 
     private fun resetGrid() {
@@ -45,6 +46,38 @@ class MainActivity : AppCompatActivity() {
             for (j in buttons[i].indices) {
                 buttons[i][j].text = ""
                 gameState.grid[i][j] = ""
+            }
+        }
+    }
+
+    private fun setButtonClickListeners() {
+        for (i in buttons.indices) {
+            for (j in buttons[i].indices) {
+                buttons[i][j].setOnClickListener {
+                    if (gameState.grid[i][j].isEmpty() && gameState.winner == null) {
+                        gameState.grid[i][j] = gameState.turn
+                        buttons[i][j].text = gameState.turn
+
+                        gameState.winner = gameState.winnerStatus
+                        if (gameState.winner != null || gameState.boardFull) {
+                            playAgainButton.visibility = View.VISIBLE
+                            turnIndicatorTextView.visibility = View.GONE
+                            val winner = gameState.winner
+                            val message: String = when (winner) {
+                                null -> "It's a Tie!"
+                                else -> "The winner is $winner!"
+                            }
+
+                            Toast.makeText(this,message, Toast.LENGTH_LONG).show()
+                        } else {
+                            gameState.turn = when (gameState.turn) {
+                                "X" -> "O"
+                                else -> "X"
+                            }
+                            turnIndicatorTextView.text = getString(R.string.play_prompt, gameState.turn)
+                        }
+                    }
+                }
             }
         }
     }
@@ -70,7 +103,15 @@ class MainActivity : AppCompatActivity() {
             get() = checkWinner(grid)
 
         private fun checkWinner(grid: Array<Array<String>>): String? {
-            return "";
+            for (row in grid) {
+                if (row[0] == row[1] && row[1] == row[2] && row[0].isNotEmpty()) return row[0]
+            }
+            for (col in 0 until 3) {
+                if (grid[0][col] == grid[1][col] && grid[1][col] == grid[2][col] && grid[0][col].isNotEmpty()) return grid[0][col]
+            }
+            if (grid[0][0] == grid[1][1] && grid[1][1] == grid[2][2] && grid[0][0].isNotEmpty()) return grid[0][0]
+            if (grid[0][2] == grid[1][1] && grid[1][1] == grid[2][0] && grid[0][2].isNotEmpty()) return grid[0][2]
+            return null
         }
     }
 
